@@ -39,8 +39,11 @@ TTF_Font *font;
 SDL_Rect r_ammo;
 SDL_Rect r_score;
 SDL_Rect r_hit;
+SDL_Rect r_round;
 SDL_Surface *s_ammo=NULL;
 SDL_Surface *s_score=NULL;
+SDL_Surface *s_round;
+SDL_Surface *s_static_text[4];
 
 //SDL VARIABLES
 SDL_Event event;
@@ -84,30 +87,35 @@ class Game{
         static void IncreaseCounter();
         static void Loose();
         static void Win();
+        static void NextMatch();
 };
-unsigned int Game::round=0, Game::counter=0, Game::match=0;
+unsigned int Game::round=1, Game::counter=0, Game::match=0;
 bool Game::hasStart=false;
 
 void Game::Start(){
-    for(int i=0; i<ducks.size(); i++){
-        ducks.erase(ducks.begin()+1);
-    }
-    sleep(2);
-    Game::SpawnEnemy();
-    hasStart = true;
-    Player::ammo = 3;
-    counter = 0;
-    match++;
-    char aux1[10];
-    sprintf(aux1, "%d", Player::ammo);
-    std::cout << aux1 << std::endl;
-    s_ammo = TTF_RenderText_Shaded(font, aux1, {255,255,255}, {0,0,0});
-    for(int i=0; i<10; i++){
-        if(ducks_interface[i] == ACTUAL){
-            ducks_interface[i] = ALIVE;
+    if(match < 10){
+        for(int i=0; i<ducks.size(); i++){
+            ducks.erase(ducks.begin()+1);
         }
+        sleep(2);
+        Game::SpawnEnemy();
+        hasStart = true;
+        Player::ammo = 3;
+        counter = 0;
+        match++;
+        char aux1[10];
+        sprintf(aux1, "%d", Player::ammo);
+        std::cout << aux1 << std::endl;
+        s_ammo = TTF_RenderText_Shaded(font, aux1, {255,255,255}, {0,0,0});
+        for(int i=0; i<10; i++){
+            if(ducks_interface[i] == ACTUAL){
+                ducks_interface[i] = ALIVE;
+            }
+        }
+        ducks_interface[match-1] = ACTUAL;
+    }else{
+        NextMatch();
     }
-    ducks_interface[match-1] = ACTUAL;
 }
 
 void Game::SpawnEnemy(){
@@ -135,6 +143,18 @@ void Game::Loose(){
 void Game::Win(){
     std::cout << "You win!" << std::endl;
     hasStart = false;
+    Start();
+}
+
+void Game::NextMatch(){
+    match = 0;
+    round++;
+    for(int i=0; i<10; i++){
+        ducks_interface[i] = ALIVE;
+    }
+    char aux[20];
+    sprintf(aux, "%d", Game::round);
+    s_round = TTF_RenderText_Solid(font, aux, {255,255,255});
     Start();
 }
 
@@ -225,17 +245,25 @@ void LoadGame(){
 
     srand(static_cast<unsigned int>(time(0)));
 
-    font = TTF_OpenFont("arial.ttf", 32);
+    font = TTF_OpenFont("Munro.ttf", 24);
 
     SDL_WM_SetCaption(GAME_NAME, NULL);
     screen = SDL_SetVideoMode(SCREEN_W, SCREEN_H, 32, SDL_SWSURFACE);
 
     //Interface Text
+    SDL_Color white = {255,255,255};
+
     unsigned int interface_y = SCREEN_H - (SCREEN_H/8.5);
     r_ammo = {SCREEN_W / 10, interface_y, 0, 0};
     r_score = {SCREEN_W - (SCREEN_W / 4.5), interface_y, 0, 0};
-    s_ammo = TTF_RenderText_Shaded(font, "3", {255,255,255}, {0,0,0});
-    s_score = TTF_RenderText_Shaded(font, "0", {255,255,255}, {0,0,0});
+    r_round = {SCREEN_W/10, SCREEN_H - SCREEN_H/5, 0, 0};
+    s_ammo = TTF_RenderText_Shaded(font, "3", white, {0,0,0});
+    s_score = TTF_RenderText_Shaded(font, "0", white, {0,0,0});
+    s_round = TTF_RenderText_Solid(font, "1", white);
+    s_static_text[0] = TTF_RenderText_Solid(font, "R = ", white);
+    s_static_text[1] = TTF_RenderText_Solid(font, "Hit", white);
+    s_static_text[2] = TTF_RenderText_Solid(font, "Score", white);
+    s_static_text[3] = TTF_RenderText_Solid(font, "Ammo", white);
 
     //Load Sprites
     r_hit = {SCREEN_W/3, interface_y, 0, 0};
@@ -309,11 +337,17 @@ void DrawScreen(){
     }
 
     apply_surface(r_ammo.x, r_ammo.y, s_ammo, screen, NULL);
-    apply_surface(r_score.x, r_score.y, s_score, screen, NULL);
+    apply_surface(r_score.x+20, r_score.y, s_score, screen, NULL);
+    apply_surface(r_round.x+40, r_round.y+9, s_round, screen, NULL);
 
     for(int i=0; i<10; i++){
         apply_surface((r_hit.x/10)*i+SCREEN_W/3, r_hit.y, s_ducks_interface, screen, &r_duck_interface[ducks_interface[i]]);
     }
+
+    apply_surface(r_round.x, r_round.y+9, s_static_text[0], screen, NULL);
+    apply_surface(r_hit.x - 50, r_hit.y, s_static_text[1], screen, NULL);
+    apply_surface(r_score.x + 22, r_score.y + 20, s_static_text[2], screen, NULL);
+    apply_surface(r_ammo.x - 2, r_ammo.y + 20, s_static_text[3], screen, NULL);
 
     SDL_Flip(screen);
 
