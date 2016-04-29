@@ -15,6 +15,7 @@
 #include <SDL/SDL_image.h>
 
 //Classes declaration
+class GameObject;
 class Game;
 class Duck;
 class Player;
@@ -58,25 +59,28 @@ SDL_Rect clip[10];
 std::vector<Duck> ducks;
 
 //Classes
+class GameObject{
+    public:
+        GameObject();
+        bool isDead = false;
+        int VEL=1, SPEED = 50;
+        int x, y, w, h, dirx, diry, timer;
+        SDL_Surface *sprite;
+};
 class Player{
     public:
         static unsigned int ammo, score;
         Player();
 };
 unsigned int Player::ammo=3, Player::score=0;
-class Duck{
+class Duck : public GameObject{
     public:
-        int VEL=1, SPEED = 50;
-        int x, y, w, h, dirx, diry, timer;
-        bool isDead = false;
-        SDL_Surface *sprite;
         Duck(int s);
         void Move();
         void Spawn();
         bool Intersects(int cx, int cy);
         void Die();
 };
-
 class Game{
     public:
         static unsigned int round, counter, match;
@@ -92,11 +96,13 @@ class Game{
 unsigned int Game::round=1, Game::counter=0, Game::match=0;
 bool Game::hasStart=false;
 
+GameObject::GameObject(){
+
+}
+
 void Game::Start(){
     if(match < 10){
-        for(int i=0; i<ducks.size(); i++){
-            ducks.erase(ducks.begin()+1);
-        }
+        ducks.clear();
         sleep(2);
         Game::SpawnEnemy();
         hasStart = true;
@@ -122,6 +128,7 @@ void Game::SpawnEnemy(){
     Duck d(rand() % 3 + 3);
     d.sprite = duck_skins[0];
     ducks.push_back(d);
+    ducks.push_back(d);
 }
 
 void Game::IncreaseCounter(){
@@ -131,7 +138,6 @@ void Game::IncreaseCounter(){
     }else if(ducks.size() <= 0){
         Win();
     }
-    std::cout << counter << std::endl;
 }
 
 void Game::Loose(){
@@ -162,7 +168,6 @@ Duck::Duck(int s){
     SPEED = s;
     timer = 0;
     Spawn();
-    std::cout << rand() % 5 + 1 << std::endl;
     dirx = VEL;
     diry = -VEL;
     if(rand() % 5 + 1 > 2){
@@ -273,7 +278,12 @@ void LoadGame(){
     duck_skins[0] = IMG_Load(sprites[1].c_str());
     s_ducks_interface = IMG_Load(sprites[2].c_str());
 
-    clip[0] = {0, 0, 67, 77};
+    const int SPRITE_W = 77;
+    const int SPRITE_H = 77;
+
+    clip[0] = {0*0, 0, SPRITE_W, SPRITE_H};
+    clip[1] = {SPRITE_W*1, 0, SPRITE_W, SPRITE_H};
+    clip[2] = {SPRITE_W*2, 0, SPRITE_W, SPRITE_H};
 
     r_duck_interface[ALIVE] = {0, 20, 18, 20};
     r_duck_interface[DEAD] = {0, 68, 18, 20};
@@ -297,14 +307,12 @@ void apply_surface(int x, int y, SDL_Surface* source, SDL_Surface* destination, 
 void Shoot(int cx, int cy){
     for(int i=0; i<ducks.size(); i++){
         if(ducks[i].Intersects(cx, cy)){
-            std::cout << "TESTE" << std::endl;
             ducks[i].Die();
         }
     }
     Player::ammo--;
     char aux1[10];
     sprintf(aux1, "%d", Player::ammo);
-    std::cout << aux1 << std::endl;
     s_ammo = TTF_RenderText_Shaded(font, aux1, {255,255,255}, {0,0,0});
 }
 
@@ -328,13 +336,27 @@ void Logic(){
 
 }
 
+int frame_timer=0;
+int anim_frame = 0;
+void AnimateDucks(std::vector<Duck>& gb, SDL_Surface* destination, SDL_Rect* tiles, int sprites){
+    for(int i=0; i<gb.size(); i++){
+        if(frame_timer>50){
+            anim_frame = rand()%sprites;
+            frame_timer=0;
+        }
+        apply_surface(gb[i].x, gb[i].y, gb[i].sprite, screen, &tiles[anim_frame]);
+    }
+    frame_timer++;
+    std::cout << frame_timer << std::endl;
+}
+
 void DrawScreen(){
 
     apply_surface(0, 0, background, screen, NULL);
 
-    for(int i=0; i<ducks.size(); i++){
-        apply_surface(ducks[i].x, ducks[i].y, ducks[i].sprite, screen, &clip[0]);
-    }
+    AnimateDucks(ducks, screen, clip, 3);
+
+    //INTERFACE
 
     apply_surface(r_ammo.x, r_ammo.y, s_ammo, screen, NULL);
     apply_surface(r_score.x+20, r_score.y, s_score, screen, NULL);
