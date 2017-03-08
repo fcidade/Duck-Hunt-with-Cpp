@@ -1,25 +1,60 @@
 #include "engine.h"
+#include "graphs.h"
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 
-void Engine::LoadGame(){
+#include <iostream>
 
-    //Fundamentals
+/* Start the engine */
+void Engine::init(){
 
-    SDL_Init(SDL_INIT_EVERYTHING);
-    TTF_Init();
-    IMG_Init(IMG_INIT_PNG);
+    //Default screen sizes;
+    this->_screen_width = 680;
+    this->_screen_height = 460;
+
+    /* Check if SDL2, SDL2_ttf and SDL2_image inits */
+    if(SDL_Init(SDL_INIT_EVERYTHING) != -1){
+        if(TTF_Init() != -1){
+            if(IMG_Init(IMG_INIT_PNG) != -1){
+                
+                // Create window
+                this->_window = SDL_CreateWindow("Duck++",
+                                                SDL_WINDOWPOS_UNDEFINED,
+                                                SDL_WINDOWPOS_UNDEFINED,
+                                                this->_screen_width,
+                                                this->_screen_height,
+                                                SDL_WINDOW_SHOWN);
+                if(this->_window){ // Check if window was successful created
+                    this->_renderer = SDL_CreateRenderer(this->_window, -1, SDL_RENDERER_ACCELERATED);
+                    if(this->_renderer){ // Check if renderer was successful created
+                        SDL_SetRenderDrawColor(this->_renderer, 0xff, 0xff, 0xff, 0xff);
+                    }
+                }
+
+            }else{
+                std::cout << "engine.cpp: Failed to init SDL Image" << std::endl << SDL_GetError() << std::endl;
+                this->quit(2);
+            }
+        }else{
+            std::cout << "engine.cpp: Failed to init SDL TTF" << std::endl << SDL_GetError() << std::endl;
+            this->quit(2);
+        }
+    }else{
+        std::cout << "engine.cpp: Failed to init SDL" << std::endl << SDL_GetError() << std::endl;
+        this->quit(2);
+    }
+
+    // Load Image Files TODO: Load image into it's own object
+    Graphs::load(this->_renderer, "sprites/background.gif");
 
     //srand(static_cast<unsigned int>(time(0)));
 
-    font = TTF_OpenFont("Munro.ttf", 24);
-
-    /*SDL_WM_SetCaption(GAME_NAME, NULL);
-    screen = SDL_SetVideoMode(SCREEN_W, SCREEN_H, 32, SDL_SWSURFACE);
+    //font = TTF_OpenFont("Munro.ttf", 24);
 
     //Interface Text
-    SDL_Color white = {255,255,255};
+    /*SDL_Color white = {255,255,255};
 
     unsigned int interface_y = SCREEN_H - (SCREEN_H/8.5);
     r_ammo = {SCREEN_W / 10, interface_y, 0, 0};
@@ -56,9 +91,33 @@ void Engine::LoadGame(){
     ENEMY_W = clip[0].w;
     ENEMY_H = clip[0].h;*/
 
+
+    this->loop();
+
 }
 
-void Engine::Logic(){
+void Engine::loop(){
+
+    //Game::Start();
+
+    while(true){
+
+        SDL_PollEvent(&this->_event);
+
+        switch(this->_event.type){
+            case SDL_QUIT:
+                this->quit(0);
+                break;
+        }
+
+        /*if(Game::hasStart){
+            Game::IncreaseCounter();
+        }*/
+        //Logic();
+        this->draw();
+
+    }
+
     /*for(int i=0; i<ducks.size(); i++){
         ducks[i].Move();
     }
@@ -77,11 +136,13 @@ void Engine::Logic(){
     */
 }
 
-void Engine::DrawScreen(){
+void Engine::draw(){
 
-    /*apply_surface(0, 0, background, screen, NULL);
+    SDL_RenderClear(this->_renderer);
 
-    AnimateDucks(ducks, screen, clip, 3);
+    //apply_surface(0, 0, background, screen, NULL);
+
+    /*AnimateDucks(ducks, screen, clip, 3);
 
     //INTERFACE
 
@@ -100,11 +161,15 @@ void Engine::DrawScreen(){
 
     SDL_Flip(screen);*/
 
+    SDL_RenderPresent(this->_renderer);
+
 }
 
-void Engine::Quit(){
-    //SDL_FreeSurface(screen);
+void Engine::quit(int flag){
+    SDL_DestroyRenderer(this->_renderer);
+    SDL_DestroyWindow(this->_window);
     IMG_Quit();
     TTF_Quit();
     SDL_Quit();
+    exit(flag);
 }

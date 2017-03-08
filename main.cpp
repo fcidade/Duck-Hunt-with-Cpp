@@ -1,13 +1,8 @@
-#ifdef __cplusplus
-    #include <cstdlib>
-#else
-    #include <stdlib.h>
-#endif
-
 #include "gameobject.h"
 #include "player.h"
 #include "game.h"
 #include "duck.h"
+#include "engine.h"
 
 #include <iostream>
 #include <string>
@@ -45,7 +40,6 @@ SDL_Surface *s_round;
 SDL_Surface *s_static_text[4];
 
 //SDL VARIABLES
-SDL_Event event;
 SDL_Surface *screen=NULL;
 
 //SPRITES
@@ -102,28 +96,8 @@ void AnimateDucks(std::vector<Duck>& gb, SDL_Surface* destination, SDL_Rect* til
 
 int main ( int argc, char** argv ){
 
-    //LoadGame();
-    //Game::Start();
-
-    bool running = true;
-
-    while(running){
-
-        SDL_PollEvent(&event);
-
-        if(event.type == SDL_QUIT){
-            running = false;
-        }
-
-        /*if(Game::hasStart){
-            Game::IncreaseCounter();
-        }
-        Logic();
-        DrawScreen();*/
-
-    }
-
-    //Quit();
+	Engine engine;
+    engine.init();
 
     return 0;
 }
