@@ -1,6 +1,6 @@
 #include "duck.h"
 
-Duck::Duck(int s){
+/*Duck::Duck(int s){
     /*SPEED = s;
     timer = 0;
     Spawn();
@@ -8,8 +8,8 @@ Duck::Duck(int s){
     diry = -VEL;
     if(rand() % 5 + 1 > 2){
         dirx *= -1;
-    }*/
-}
+    }
+}*/
 
 void Duck::Move(){
     /*timer++;

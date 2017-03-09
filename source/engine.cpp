@@ -47,7 +47,10 @@ void Engine::init(){
     }
 
     // Load Image Files TODO: Load image into it's own object
-    Graphs::load(this->_renderer, "sprites/background.gif");
+    SDL_Texture* tmp = Graphs::load(this->_renderer, "sprites/background.gif");
+    GameObject tmpObj = GameObject("Background", tmp);
+    tmpObj.x(0)->y(0)->w(this->_screen_width)->h(this->_screen_height);
+    _objects.push_back(tmpObj);
 
     //srand(static_cast<unsigned int>(time(0)));
 
@@ -139,6 +142,12 @@ void Engine::loop(){
 void Engine::draw(){
 
     SDL_RenderClear(this->_renderer);
+
+    for(int i=0; i<this->_objects.size(); i++){
+        this->_objects[i].draw(this->_renderer);
+    }
+
+    //SDL_RenderCopy(this->_renderer, this->_objects[0].tex(), NULL, NULL);
 
     //apply_surface(0, 0, background, screen, NULL);
 
