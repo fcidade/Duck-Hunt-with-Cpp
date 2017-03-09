@@ -1,5 +1,4 @@
 #include "gameobject.h"
-#include <iostream>
 // Constructors
 
 GameObject::GameObject(std::string n, SDL_Texture* t){
@@ -15,10 +14,6 @@ GameObject::GameObject(std::string n, SDL_Texture* t){
 // Engine
 
 void GameObject::draw(SDL_Renderer* renderer){
-	std::cout << "x: " << this->texPos()->x << std::endl;
-	std::cout << "y: " << this->texPos()->y << std::endl;
-	std::cout << "w: " << this->texPos()->w << std::endl;
-	std::cout << "h: " << this->texPos()->h << std::endl;
 	SDL_RenderCopy(renderer, this->tex(), this->texPos(), this->pos());
 }
 
@@ -82,26 +77,31 @@ GameObject* GameObject::h(int n){
 	return this;
 }
 
-void GameObject::pos(SDL_Rect r){
+GameObject* GameObject::pos(SDL_Rect r){
 	this->_pos = r;
+	return this;
 }
 
-void GameObject::texPos(SDL_Rect r){
+GameObject* GameObject::texPos(SDL_Rect r){
 	this->_texPos = r;
+	return this;
 }
 
-void GameObject::name(std::string n){
+GameObject* GameObject::name(std::string n){
 	this->_name = n;
+	return this;
 }
 
-void GameObject::tex(SDL_Texture* t){
+GameObject* GameObject::tex(SDL_Texture* t){
 	int tempW, tempH;
 	SDL_QueryTexture(t, NULL, NULL, &tempW, &tempH);
 	SDL_Rect rect = {0, 0, tempW, tempH};
 	this->texPos(rect);
 	this->_texture = t;
+	return this;
 }
 
-void GameObject::active(bool a){
+GameObject* GameObject::active(bool a){
 	this->_active = a;
+	return this;
 }

@@ -1,5 +1,17 @@
 #include "duck.h"
 
+Duck::Duck(std::string n, SDL_Texture* t) : GameObject(n, t){
+    this->x(0); //TODO: RANDOM
+    this->y(0); //TODO: RANDOM
+    this->w(77); //FIX
+    this->h(77); //FIX
+    this->name(n);
+    this->tex(t);
+    SDL_Rect tmp = {0, 0, 77, 77}; //TODO: GetFrame on Graphs file
+    this->texPos(tmp);
+    this->active(true);
+}
+
 /*Duck::Duck(int s){
     /*SPEED = s;
     timer = 0;
@@ -9,7 +21,7 @@
     if(rand() % 5 + 1 > 2){
         dirx *= -1;
     }
-}*/
+}
 
 void Duck::Move(){
     /*timer++;
@@ -39,7 +51,7 @@ void Duck::Move(){
 
         timer = 0;
     }
-    */
+    
 }
 
 void Duck::Spawn(){
@@ -54,7 +66,7 @@ bool Duck::Intersects(int cx, int cy){
        (y < cy && y + h > cy)){
         return true;
     }
-    return false;*/
+    return false;
 }
 
 void Duck::Die(){
@@ -68,5 +80,6 @@ void Duck::Die(){
             s_score = TTF_RenderText_Shaded(font, aux, {255,255,255}, {0,0,0});
             ducks_interface[Game::match-1] = DEAD;
         }
-    }*/
+    }
 }
+*/

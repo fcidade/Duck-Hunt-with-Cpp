@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "graphs.h"
+#include "duck.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -46,11 +47,14 @@ void Engine::init(){
         this->quit(2);
     }
 
-    // Load Image Files TODO: Load image into it's own object
+    // Load Image Files TODO: Load background image into it's own object and add it to the vector
     SDL_Texture* tmp = Graphs::load(this->_renderer, "sprites/background.gif");
     GameObject tmpObj = GameObject("Background", tmp);
     tmpObj.x(0)->y(0)->w(this->_screen_width)->h(this->_screen_height);
     _objects.push_back(tmpObj);
+
+    tmp = Graphs::load(this->_renderer, "sprites/duck.gif");
+    _objects.push_back(Duck("Duck A", tmp));
 
     //srand(static_cast<unsigned int>(time(0)));
 

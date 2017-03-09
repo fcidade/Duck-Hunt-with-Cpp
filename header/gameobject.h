@@ -16,15 +16,15 @@ class GameObject{
     	int h();
     	SDL_Rect* pos();
     	SDL_Rect* texPos();
-    	void name(std::string);
-    	void tex(SDL_Texture*); //Todo: Overload to set _texPos too
-    	void active(bool);
+    	GameObject* name(std::string);
+    	GameObject* tex(SDL_Texture*); //Todo: Overload to set _texPos too
+    	GameObject* active(bool);
     	GameObject* x(int);
     	GameObject* y(int);
     	GameObject* w(int);
     	GameObject* h(int);
-    	void pos(SDL_Rect);
-    	void texPos(SDL_Rect);
+    	GameObject* pos(SDL_Rect);
+    	GameObject* texPos(SDL_Rect);
     private:
         std::string _name;
         SDL_Texture *_texture;
