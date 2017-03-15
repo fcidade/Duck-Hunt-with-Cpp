@@ -47,22 +47,6 @@ SDL_Surface *background=NULL;
 SDL_Surface *duck_skins[3]={NULL,NULL,NULL};
 SDL_Rect clip[10];
 
-//Game Characters
-std::vector<Duck> ducks;
-
-
-
-
-
-void apply_surface(int x, int y, SDL_Surface* source, SDL_Surface* destination, SDL_Rect* c){
-    SDL_Rect offset;
-
-    offset.x = x;
-    offset.y = y;
-
-    //SDL_BlitSurface(source, c, destination, &offset);
-}
-
 void Shoot(int cx, int cy){
     /*for(int i=0; i<ducks.size(); i++){
         if(ducks[i].Intersects(cx, cy)){

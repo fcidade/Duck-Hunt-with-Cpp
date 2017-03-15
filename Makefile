@@ -1,2 +1,9 @@
+CC = g++
+CPP = -std=c++11
+SOURCE = main.cpp source/*.cpp
+INCLUDE = -Iheader -lSDL2 -lSDL2_image -lSDL2_ttf
+WARNING = -w
+OUTPUT = -o o
+
 all:
-	g++ main.cpp source/*.cpp -Iheader -std=c++11 -lSDL2 -lSDL2_image -lSDL2_ttf -w -o o
+	$(CC) $(SOURCE) $(INCLUDE) $(CPP) $(WARNING) $(OUTPUT)
